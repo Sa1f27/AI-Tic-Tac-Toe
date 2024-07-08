@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(45deg, #1f4037, #99f2c8);
+            font-family: 'Roboto', sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .scoreboard {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .scoreboard p {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        table {
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+        td {
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            font-size: 2rem;
+            border: 1px solid #444;
+        }
+        button {
+            width: 100%;
+            height: 100%;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        button:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+    <div class="scoreboard">
+        <p>Player Wins: <span id="player-wins">{{ player_wins }}</span></p>
+        <p>AI Wins: <span id="ai-wins">{{ ai_wins }}</span></p>
+    </div>
+    <table>
+        <tr>
+            <td><button onclick="makeMove(0, 0)"></button></td>
+            <td><button onclick="makeMove(0, 1)"></button></td>
+            <td><button onclick="makeMove(0, 2)"></button></td>
+        </tr>
+        <tr>
+            <td><button onclick="makeMove(1, 0)"></button></td>
+            <td><button onclick="makeMove(1, 1)"></button></td>
+            <td><button onclick="makeMove(1, 2)"></button></td>
+        </tr>
+        <tr>
+            <td><button onclick="makeMove(2, 0)"></button></td>
+            <td><button onclick="makeMove(2, 1)"></button></td>
+            <td><button onclick="makeMove(2, 2)"></button></td>
+        </tr>
+    </table>
+    <script>
+        let board = [[" ", " ", " "], [" ", " ", " "], [" ", " ", " "]];
+
+        function makeMove(row, col) {
+            if (board[row][col] === " ") {
+                board[row][col] = "X";
+                document.querySelectorAll('table button')[row * 3 + col].textContent = "X";
+                fetch('/move', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({board: board})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.move) {
+                        const [aiRow, aiCol] = data.move;
+                        board[aiRow][aiCol] = "O";
+                        document.querySelectorAll('table button')[aiRow * 3 + aiCol].textContent = "O";
+                    }
+                    if (data.winner) {
+                        alert(data.winner + " wins!");
+                        document.getElementById('player-wins').textContent = data.player_wins;
+                        document.getElementById('ai-wins').textContent = data.ai_wins;
+                        resetBoard();
+                    } else if (isDraw()) {
+                        alert("It's a draw!");
+                        resetBoard();
+                    }
+                });
+            }
+        }
+
+        function isDraw() {
+            return board.flat().every(cell => cell !== " ");
+        }
+
+        function resetBoard() {
+            board = [[" ", " ", " "], [" ", " ", " "], [" ", " ", " "]];
+            document.querySelectorAll('table button').forEach(button => {
+                button.textContent = "";
+            });
+        }
+    </script>
+</body>
+</html>
