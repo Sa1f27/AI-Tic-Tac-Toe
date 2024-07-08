@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from flask import Flask, render_template, request, jsonify
 import math
 
@@ -104,7 +104,6 @@ def move():
 
 if __name__ == '__main__':
     app.run(debug=True)
-=======
 from flask import Flask, render_template, request, jsonify
 import math
 
@@ -210,4 +209,3 @@ def move():
 
 if __name__ == '__main__':
     app.run(debug=True)
->>>>>>> 0e9f4a9d51ebec50d28f80a9ff32c8f3fe5fa797
